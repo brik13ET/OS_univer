@@ -1,5 +1,6 @@
 #pragma once
 #include <stdlib.h>
+#include <string.h>
 #include "LinkedList.h"
 
 // Cycle double linked list
@@ -7,11 +8,14 @@
 LinkedList* new_LinkedList()
 {
 	LinkedList* ret = (LinkedList*)malloc(sizeof(LinkedList));
-	ret->head = (LinkedListNode*)malloc(sizeof(LinkedListNode));
-	ret->head->data = 0;
-	ret->head->data_size = 0;
-	ret->head->next = ret->head;
-	ret->head->prev = ret->head;
+	if (ret)
+	{
+		ret->head = (LinkedListNode*)malloc(sizeof(LinkedListNode));
+		ret->head->data = 0;
+		ret->head->data_size = 0;
+		ret->head->next = ret->head;
+		ret->head->prev = ret->head;
+	}
 	return ret;
 }
 
@@ -58,10 +62,7 @@ void	addAfter_Linkedlist(LinkedListNode* n, void* data_ptr, size_t siz)
 	n->next = nn;
 	n->next->prev = nn;
 
-	for (size_t i = 0; i < siz; i++)
-	{
-		((uint8_t*)nn->data)[i] = ((uint8_t*)data_ptr)[i];
-	}
+	memcpy_s(nn->data, nn->data_size, data_ptr, siz);
 }
 
 void	addBefore_Linkedlist(LinkedListNode* n, void* data_ptr, size_t siz)
@@ -74,13 +75,10 @@ void	addBefore_Linkedlist(LinkedListNode* n, void* data_ptr, size_t siz)
 
 	nn->next = n;
 	nn->prev = n->prev;
-	n->prev->next = nn;
+	nn->prev->next = nn;
 	n->prev = nn;
 
-	for (size_t i = 0; i < siz; i++)
-	{
-		((uint8_t*)nn->data)[i] = ((uint8_t*)data_ptr)[i];
-	}
+	memcpy_s(nn->data, siz, data_ptr, siz);
 }
 
 void	clear_Linkedlist(LinkedList* l)

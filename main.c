@@ -1,8 +1,11 @@
-#include "AssociativeArray.h"
-#include <locale.h>
 #include <stdio.h>
-#include <stdint.h>
-/*
+#include <locale.h>
+
+#define USENATIVE
+#ifdef USENATIVE
+
+#include <Windows.h>
+
 void* MyAlloc(size_t siz)
 {
 	HANDLE h = GetProcessHeap();
@@ -14,56 +17,65 @@ BOOL MyFree(void* ptr)
 	return HeapFree(GetProcessHeap(), 0, (LPVOID)ptr);
 }
 
-int* iterate(int m, int* cnt)
-{
-	int num_cnt = 0;
-	for (size_t i = 100; i < 1000; i++)
-		if ((i % 10) + (i % 100 / 10) + (i / 100) == m)
-			num_cnt++;
 
-	cnt[0] = num_cnt;
-	int* ret = MyAlloc(sizeof(int)*num_cnt);
-	int arr_i = 0;
-	for (size_t i = 100; i < 1000; i++)
-		if ((i % 10) + (i % 100 / 10) + (i / 100) == m)
-		{
-			ret[arr_i] = (int)i;
-			arr_i++;
-		}
-	return ret;
-}
+#define ALLOC(X) MyAlloc(X)
+#define FREE(X) MyFree(X)
 
-int main(void)
+#else
+
+#include <stdlib.h>
+
+#define ALLOC(X) malloc(X)
+#define FREE(X) free(X)
+
+
+#endif
+
+
+
+void main(void)
 {
+	int arr_dim1, arr_dim2;
 	setlocale(LC_ALL, "ru");
-	int M, count;
-	scanf_s("%d", &M);
-	int* arr = iterate(M, &count);
-	for (int i = 0; i < count; i++)
+	printf("Введите размеры массива: ");
+	scanf_s("%d %d", &arr_dim1, &arr_dim2);
+	int** arr = ALLOC(sizeof(int*) * arr_dim1);
+	if (!arr)
 	{
-		if (i % 14 == 0)
-			printf("\n");
-		printf("%03d\t", arr[i]);
+		fprintf(stderr, "unable alloc() for %d bytes\n", (int)sizeof(int) * arr_dim1 * arr_dim2);
+		return;
 	}
-	printf("\nВсего %d чисел\n", count);
-	MyFree(arr);
+	for (int i = 0; i < arr_dim1; i++)
+	{
+		arr[i] = ALLOC(sizeof(int) * arr_dim2);
+	}
+
+	for (size_t i = 0; i < arr_dim1; i++)
+	{
+		for (size_t j = 0; j < arr_dim2; j++)
+		{
+			arr[i][j] = i * arr_dim2 + j;
+			printf("%d\t", arr[i][j]);
+		}
+		putchar('\n');
+	}
+	putchar('\n');
+
+	for (size_t i = 0; i < arr_dim1; i++)
+	{
+		float sum = 0;
+		for (size_t j = 0; j < arr_dim2; j++)
+			sum += arr[i][j];
+		for (size_t j = 0; j < arr_dim2; j++)
+			*((float*)&arr[i][j]) = arr[i][j] / sum;
+		for (size_t j = 0; j < arr_dim2; j++)
+			printf("%01.4lf\t", *((float*)&arr[i][j]));
+		putchar('\n');
+	}
+
+	for (int i = 0; i < arr_dim1; i++)
+	{
+		FREE(arr[i]);
+	}
+	FREE(arr);
 }
-*/
-/*
-int main(int argc, char* argv[])
-{
-	LinkedList* l = new_LinkedList();
-	for (size_t i = 0; i < 32; i++)
-	{
-		int sq = i * i;
-		append_Linkedlist(l, &sq, sizeof(sq));
-	}
-	LinkedListNode* n = l->head->next;
-	while (n != l->head)
-	{
-		printf("%d\t", ((int*)n->data)[0]);
-		n = n->next;
-	}
-	return 0;
-}
-*/
