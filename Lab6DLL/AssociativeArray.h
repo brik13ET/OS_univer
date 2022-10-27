@@ -15,12 +15,14 @@ struct Pair_s
 struct AssociativeArray_s
 {
 	LinkedList* l;
+	Allocator a;
+	Deallocator d;
 };
 
 typedef struct AssociativeArray_s AssociativeArray;
 typedef struct Pair_s Pair;
 
-_CONTAINER_API AssociativeArray* new_AssociativeArray();
+_CONTAINER_API AssociativeArray* new_AssociativeArray(Allocator, Deallocator);
 _CONTAINER_API void addPair_AssociativeArray(Pair, AssociativeArray*);
 _CONTAINER_API void addKeyValue_AssociativeArray(void* key, size_t key_size, void* value, size_t value_size, AssociativeArray*);
 _CONTAINER_API size_t len_AssociativeArray(AssociativeArray* a);

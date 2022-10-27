@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "LinkedList.h"
-#include "FileIO.h"
 
 // Cycle double linked list
 
@@ -37,7 +36,7 @@ void	removeBefore_Linkedlist(LinkedListNode* n)
 {
 	if (!n && !n->prev)
 		return;
-	remove(n->prev);
+	remove_LinkedList(n->prev);
 }
 
 void	remove_LinkedList(LinkedListNode* n)
@@ -101,7 +100,7 @@ void	clear_Linkedlist(LinkedList* l)
 size_t	len_LinkedList(LinkedList* l)
 {
 	if (!l)
-		return;
+		return -1;
 	size_t ret = 1;
 	LinkedListNode* n = l->head->next;
 	while (n != l->head)
@@ -117,28 +116,4 @@ void	del_LinkedList(LinkedList* l)
 	clear_Linkedlist(l);
 	remove_LinkedList(l->head);
 	free(l);
-}
-
-void savebin_LinkedList(HANDLE fd, LinkedList* l)
-{
-	LinkedListNode *n = l->head->next;
-	while (n != l->head)
-	{
-		file_write(fd, &(n->data_size), sizeof(n->data_size));
-		file_write(fd, n->data, n->data_size);
-	}
-}
-
-void restorebin_LinkedList(HANDLE fd, LinkedList* l)
-{
-	void* buf;
-	size_t siz;
-	while (!file_iseof(fd))
-	{
-		file_read(fd, &siz, sizeof(siz));
-		buf = malloc(siz);
-		file_read(fd, buf, siz);
-		addBefore_Linkedlist(l->head, buf, siz);
-		free(buf);
-	}
 }

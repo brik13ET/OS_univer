@@ -2,7 +2,7 @@
 #include "AssociativeArray.h"
 #include "FileIO.h"
 
-//#define Save
+#define Save
 
 int main(int argc, char* argv[])
 {

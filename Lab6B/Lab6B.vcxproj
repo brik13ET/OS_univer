@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{693ae01d-ad3f-418c-abb1-87edd1bef5cd}</ProjectGuid>
-    <RootNamespace>Lab6A</RootNamespace>
+    <ProjectGuid>{760ed17a-ab97-4388-a3ab-9e3f1e8f97cd}</ProjectGuid>
+    <RootNamespace>Lab6B</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt\;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\GitRepos\OS_univer\x64\Debug;$(ProjectDir);C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x64\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -131,7 +131,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Lab6A.c" />
+    <ProjectReference Include="..\Lab6DLL\Lab6DLL.vcxproj">
+      <Project>{017adc82-0193-4c20-b743-a929e85df4d7}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

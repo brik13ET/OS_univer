@@ -1,23 +1,49 @@
 ﻿#include <stdio.h>
+#include <stdlib.h>
 #include <Windows.h>
+#define LAB6_ONLYTYPE
 #include "..\\Lab6DLL\Containers.h"	
+
+void* MyAlloc(size_t siz)
+{
+	return malloc(siz);
+}
+void MyDealloc(void* ptr)
+{
+	return free(ptr);
+}
 
 int main()
 {
 	HINSTANCE ee = LoadLibraryA("lab6DLL");
 	if (ee)
 	{
-		AssociativeArray* (*new_AssociativeArray)() = GetProcAddress(ee, "new_AssociativeArray");
+		AssociativeArray* (*new_AssociativeArray)(Allocator, Deallocator) = GetProcAddress(ee, "new_AssociativeArray");
 		void (*del_AssociativeArray)(AssociativeArray*) = GetProcAddress(ee, "del_AssociativeArray");
-		LinkedList* (*new_LinkedList)() = GetProcAddress(ee, "new_LinkedList");
+		addKeyValue_AssociativeArray = GetProcAddress(ee, "addKeyValue_AssociativeArray");
+
 		void (*del_LinkedList)(LinkedList*) = GetProcAddress(ee, "del_LinkedList");
+
 		printf("%p %s\n", new_AssociativeArray, "new_AssociativeArray");
 		printf("%p %s\n", del_AssociativeArray, "del_AssociativeArray");
-		printf("%p %s\n", new_LinkedList, "new_LinkedList");
-		printf("%p %s\n", del_LinkedList, "del_LinkedList");
-		LinkedList* a = new_LinkedList();
-		printf("%p\n", a);
-		del_LinkedList(a);
+		printf("%p %s\n", addKeyValue_AssociativeArray, "addKeyValue_AssociativeArray");
+		printf("%p %s\n", at_AssociativeArray, "at_AssociativeArray");
+
+		AssociativeArray* arr = new_AssociativeArray(MyAlloc, MyDealloc);
+		printf("AssociativeArray: %p\n", arr);
+
+		for (int i = 0; i < 32; i++)
+		{
+			int sq = i * i;
+			addKeyValue_AssociativeArray(&i, sizeof(i), &sq, sizeof(sq), arr);
+		}
+		for (int i = 0; i < 32; i++)
+		{
+			Pair* p = at_AssociativeArray(&i, sizeof(i), arr);
+			printf("k: %04d\tv: %04d\n", *(int*)p->key_ptr, *(int*)p->value_ptr);
+		}
+		del_AssociativeArray(arr);
+		
 		FreeLibrary(ee);
 	}
 }

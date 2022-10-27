@@ -1,6 +1,7 @@
 #pragma once
-#define CONTAINER_API __declspec(dllimport)
 #include "pch.h"
+
+
 
 struct Pair_s;
 struct AssociativeArray_s;
@@ -38,6 +39,11 @@ struct AssociativeArray_s
 	LinkedList* l;
 };
 
+typedef void* (*Allocator)(size_t);
+typedef void (*Deallocator)(void*);
+
+#ifndef LAB6_ONLYTYPE
+#define CONTAINER_API __declspec(dllimport)
 
 CONTAINER_API HANDLE	file_open(char*, enum FMODE, DWORD);
 CONTAINER_API void		file_close(HANDLE);
@@ -46,20 +52,20 @@ CONTAINER_API size_t	file_write(HANDLE, void*, size_t);
 CONTAINER_API size_t	file_pos(HANDLE, UINT64, enum FPOS);
 CONTAINER_API BOOL		file_iseof(HANDLE);
 
-CONTAINER_API LinkedList* new_LinkedList();
-CONTAINER_API void	append_Linkedlist(LinkedList*, void*, size_t);
-CONTAINER_API void	removeAfter_Linkedlist(LinkedListNode*);
-CONTAINER_API void	removeBefore_Linkedlist(LinkedListNode*);
-CONTAINER_API void	remove_LinkedList(LinkedListNode*);
-CONTAINER_API void	addAfter_Linkedlist(LinkedListNode*, void*, size_t);
-CONTAINER_API void	addBefore_Linkedlist(LinkedListNode*, void*, size_t);
+CONTAINER_API LinkedList* new_LinkedList(Allocator, Deallocator);
+CONTAINER_API void	append_Linkedlist(LinkedList*, void*, size_t, LinkedList*);
+CONTAINER_API void	removeAfter_Linkedlist(LinkedListNode*, LinkedList*);
+CONTAINER_API void	removeBefore_Linkedlist(LinkedListNode*, LinkedList*);
+CONTAINER_API void	remove_LinkedList(LinkedListNode*, LinkedList*);
+CONTAINER_API void	addAfter_Linkedlist(LinkedListNode*, void*, size_t, LinkedList*);
+CONTAINER_API void	addBefore_Linkedlist(LinkedListNode*, void*, size_t, LinkedList*);
 CONTAINER_API void	clear_Linkedlist(LinkedList*);
 CONTAINER_API size_t	len_LinkedList(LinkedList*);
 CONTAINER_API void	del_LinkedList(LinkedList*);
 CONTAINER_API void	savebin_LinkedList(HANDLE, LinkedList*);
 CONTAINER_API void	restorebin_LinkedList(HANDLE, LinkedList*);
 
-CONTAINER_API AssociativeArray* new_AssociativeArray();
+CONTAINER_API AssociativeArray* new_AssociativeArray(Allocator, Deallocator);
 CONTAINER_API void addPair_AssociativeArray(Pair, AssociativeArray*);
 CONTAINER_API void addKeyValue_AssociativeArray(void* key, size_t key_size, void* value, size_t value_size, AssociativeArray*);
 CONTAINER_API size_t len_AssociativeArray(AssociativeArray* a);
@@ -68,3 +74,5 @@ CONTAINER_API void remove_AssociativeArray(void* key, size_t key_size, Associati
 CONTAINER_API void del_AssociativeArray(AssociativeArray*);
 CONTAINER_API void savebin_AssociativeArray(HANDLE, AssociativeArray*);
 CONTAINER_API void restorebin_AssociativeArray(HANDLE, AssociativeArray*);
+
+#endif

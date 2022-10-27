@@ -8,12 +8,14 @@
 
 // Cycle double linked list
 
-LinkedList* new_LinkedList()
+LinkedList* new_LinkedList(Allocator a, Deallocator d)
 {
-	LinkedList* ret = (LinkedList*)MyAlloc(sizeof(LinkedList));
+	LinkedList* ret = (LinkedList*)a(sizeof(LinkedList));
 	if (ret)
 	{
-		ret->head = (LinkedListNode*)MyAlloc(sizeof(LinkedListNode));
+		ret->a = a;
+		ret->d = d;
+		ret->head = (LinkedListNode*)a(sizeof(LinkedListNode));
 		ret->head->data = 0;
 		ret->head->data_size = 0;
 		ret->head->next = ret->head;
@@ -24,40 +26,40 @@ LinkedList* new_LinkedList()
 
 void	append_Linkedlist(LinkedList* l, void* data_ptr, size_t siz)
 {
-	addBefore_Linkedlist(l->head, data_ptr, siz);
+	addBefore_Linkedlist(l->head, data_ptr, siz, l);
 }
 
-void	removeAfter_Linkedlist(LinkedListNode* n)
+void	removeAfter_Linkedlist(LinkedListNode* n, LinkedList* l)
 {
 	if (!n && !n->next)
 		return;
-	remove_LinkedList(n->next);
+	remove_LinkedList(n->next, l);
 
 }
 
-void	removeBefore_Linkedlist(LinkedListNode* n)
+void	removeBefore_Linkedlist(LinkedListNode* n, LinkedList *l)
 {
 	if (!n && !n->prev)
 		return;
-	remove(n->prev);
+	remove_LinkedList(n->prev, l);
 }
 
-void	remove_LinkedList(LinkedListNode* n)
+void	remove_LinkedList(LinkedListNode* n, LinkedList* l)
 {
 	if (!n)
 		return;
 	n->prev->next = n->next;
 	n->next->prev = n->prev;
-	MyFree(n->data);
-	MyFree(n);
+	l->d(n->data);
+	l->d(n);
 }
 
-void	addAfter_Linkedlist(LinkedListNode* n, void* data_ptr, size_t siz)
+void	addAfter_Linkedlist(LinkedListNode* n, void* data_ptr, size_t siz, LinkedList* l)
 {
 	if (!n)
 		return;
-	LinkedListNode* nn = malloc(sizeof(LinkedListNode));
-	nn->data = malloc(siz);
+	LinkedListNode* nn = l->a(sizeof(LinkedListNode));
+	nn->data = l->a(siz);
 	nn->data_size = siz;
 
 	nn->next = n->next;
@@ -68,12 +70,12 @@ void	addAfter_Linkedlist(LinkedListNode* n, void* data_ptr, size_t siz)
 	memcpy_s(nn->data, nn->data_size, data_ptr, siz);
 }
 
-void	addBefore_Linkedlist(LinkedListNode* n, void* data_ptr, size_t siz)
+void	addBefore_Linkedlist(LinkedListNode* n, void* data_ptr, size_t siz, LinkedList* l)
 {
 	if (!n)
 		return;
-	LinkedListNode* nn = malloc(sizeof(LinkedListNode));
-	nn->data = malloc(siz);
+	LinkedListNode* nn = l->a(sizeof(LinkedListNode));
+	nn->data = l->a(siz);
 	nn->data_size = siz;
 
 	nn->next = n;
@@ -93,10 +95,10 @@ void	clear_Linkedlist(LinkedList* l)
 	l->head->prev = l->head;
 	while (n != l->head)
 	{
-		free(n->data);
+		l->d(n->data);
 		n = n->next;
 		if (n->prev != l->head)
-			free(n->prev);
+			l->d(n->prev);
 	}
 }
 
@@ -117,8 +119,8 @@ size_t	len_LinkedList(LinkedList* l)
 void	del_LinkedList(LinkedList* l)
 {
 	clear_Linkedlist(l);
-	remove_LinkedList(l->head);
-	MyFree(l);
+	remove_LinkedList(l->head, l);
+	l->d(l);
 }
 
 void savebin_LinkedList(HANDLE fd, LinkedList* l)
@@ -140,9 +142,9 @@ void restorebin_LinkedList(HANDLE fd, LinkedList* l)
 	while (!file_iseof(fd))
 	{
 		file_read(fd, &siz, sizeof(siz));
-		buf = malloc(siz);
+		buf = l->a(siz);
 		file_read(fd, buf, siz);
-		addBefore_Linkedlist(l->head, buf, siz);
-		free(buf);
+		addBefore_Linkedlist(l->head, buf, siz, l);
+		l->d(buf);
 	}
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include <windef.h>
+#include <Windows.h>
 
 struct LinkedListNode_s;
 struct LinkedList_s;

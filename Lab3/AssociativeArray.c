@@ -79,12 +79,3 @@ void del_AssociativeArray(AssociativeArray* a)
 	del_LinkedList(a->l);
 	free(a);
 }
-
-void savebin_AssociativeArray(HANDLE _1, AssociativeArray* _2)
-{
-	savebin_LinkedList(_1, _2->l);
-}
-void restorebin_AssociativeArray(HANDLE _1, AssociativeArray* _2)
-{
-	restorebin_LinkedList(_1, _2->l);
-}

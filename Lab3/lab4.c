@@ -2,7 +2,7 @@
 #include "LinkedList.h"
 #include "AssociativeArray.h"
 
-//#define NODE_ITERATE
+#define NODE_ITERATE
 
 int main(int argc, char* argv[])
 {
