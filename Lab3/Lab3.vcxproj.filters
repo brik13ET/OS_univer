@@ -15,22 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Lab3.c">
+    <ClCompile Include="AssociativeArray.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="..\AssociativeArray.c">
+    <ClCompile Include="lab4.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="..\Linkedlist.c">
+    <ClCompile Include="Linkedlist.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\AssociativeArray.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="AssociativeArray.h">
+      <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="..\LinkedList.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="LinkedList.h">
+      <Filter>Исходные файлы</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
