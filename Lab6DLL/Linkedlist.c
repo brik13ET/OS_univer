@@ -10,7 +10,8 @@
 
 LinkedList* new_LinkedList(Allocator a, Deallocator d)
 {
-	LinkedList* ret = (LinkedList*)a(sizeof(LinkedList));
+	int siz = sizeof(LinkedList);
+	LinkedList* ret = (LinkedList*)a(siz);
 	if (ret)
 	{
 		ret->a = a;
@@ -105,7 +106,7 @@ void	clear_Linkedlist(LinkedList* l)
 size_t	len_LinkedList(LinkedList* l)
 {
 	if (!l)
-		return;
+		return -1;
 	size_t ret = 1;
 	LinkedListNode* n = l->head->next;
 	while (n != l->head)

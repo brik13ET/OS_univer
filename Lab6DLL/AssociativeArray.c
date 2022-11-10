@@ -6,10 +6,10 @@
 uint8_t byte_cmp(void* p1, void* p2, size_t s, size_t ss)
 {
 	uint8_t ret = s == ss;
-	while (ret && s >= 0)
+	while (ret && (s >= 0))
 	{
 		s--;
-		ret = (((uint8_t*)p1)[s] == ((uint8_t*)p1)[s]);
+		ret = (((uint8_t*)p1)[s] == ((uint8_t*)p2)[s]);
 	}
 	return ret;
 }
@@ -33,7 +33,7 @@ void addPair_AssociativeArray(Pair p, AssociativeArray* a)
 		* dup_val = a->a(p.value_size);
 	memcpy(dup_key, p.key_ptr, p.key_size);
 	memcpy(dup_val, p.value_ptr, p.value_size);	
-	append_Linkedlist(a->l, &p, sizeof(p),a);
+	append_Linkedlist(a->l, &p, sizeof(p),a->l);
 }
 
 void addKeyValue_AssociativeArray(void* key, size_t key_size, void* value, size_t value_size, AssociativeArray* a)
@@ -47,7 +47,7 @@ void addKeyValue_AssociativeArray(void* key, size_t key_size, void* value, size_
 	memcpy(dup_key, key, key_size);
 	memcpy(dup_val, value, value_size);
 	Pair p = (Pair){ .key_ptr = dup_key, .key_size = key_size, .value_ptr = dup_val, .value_size = value_size };
-	append_Linkedlist(a->l, &p, sizeof(Pair),a);
+	append_Linkedlist(a->l, &p, sizeof(Pair),a->l);
 }
 
 Pair* at_AssociativeArray(void* key_ptr, size_t key_size, AssociativeArray* a)
@@ -81,7 +81,7 @@ void remove_AssociativeArray(void* key, size_t key_size, AssociativeArray* a)
 	}
 	if (n == a->l->head)
 		return;
-	remove_LinkedList(n, a);
+	remove_LinkedList(n, a->l);
 }
 
 void del_AssociativeArray(AssociativeArray* a)
@@ -96,17 +96,15 @@ void savebin_AssociativeArray(HANDLE fd, AssociativeArray* a)
 	while (n != a->l->head)
 	{
 		Pair* p = n->data;
-		file_write(fd, &p->key_size, sizeof(p->key_size));
-		file_write(fd, p->key_ptr, p->key_size);
-		file_write(fd, &p->value_size, sizeof(p->value_size));
-		file_write(fd, p->value_ptr, p->value_size);
+		file_write(fd, &p->key_size,	sizeof(p->key_size));
+		file_write(fd, p->key_ptr,		p->key_size);
+		file_write(fd, &p->value_size,	sizeof(p->value_size));
+		file_write(fd, p->value_ptr,	p->value_size);
 		n = n->next;
 	}
 }
 void restorebin_AssociativeArray(HANDLE fd, AssociativeArray* a)
 {
-	void* buf;
-	size_t siz;
 	while (!file_iseof(fd))
 	{
 		Pair* p = a->a(sizeof(Pair));

@@ -1,14 +1,16 @@
 #include <stdio.h>
 #include "..\\Lab6DLL\Containers.h"
 
+// неявное
 void* Allc(size_t s)
 {
-	return malloc(s);
+	HANDLE h = GetProcessHeap();
+	return (void*)HeapAlloc(h, 0, s);
 }
 
 void Deallc(void* p)
 {
-	free(p);
+	return HeapFree(GetProcessHeap(), 0, (LPVOID)p);
 }
 
 void main(void)

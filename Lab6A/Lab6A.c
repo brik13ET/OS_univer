@@ -4,6 +4,7 @@
 #define LAB6_ONLYTYPE
 #include "..\\Lab6DLL\Containers.h"	
 
+// явное
 void* MyAlloc(size_t siz)
 {
 	return malloc(siz);

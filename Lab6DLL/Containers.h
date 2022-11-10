@@ -1,8 +1,6 @@
 #pragma once
 #include "pch.h"
 
-
-
 struct Pair_s;
 struct AssociativeArray_s;
 struct LinkedListNode_s;
@@ -74,5 +72,4 @@ CONTAINER_API void remove_AssociativeArray(void* key, size_t key_size, Associati
 CONTAINER_API void del_AssociativeArray(AssociativeArray*);
 CONTAINER_API void savebin_AssociativeArray(HANDLE, AssociativeArray*);
 CONTAINER_API void restorebin_AssociativeArray(HANDLE, AssociativeArray*);
-
 #endif
