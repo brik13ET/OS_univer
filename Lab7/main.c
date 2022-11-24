@@ -16,7 +16,7 @@ volatile HANDLE mArg;
 
 DWORD WINAPI Thread2(LPVOID lpParam)
 {
-	WaitForSingleObject(mArray, INFINITE);
+	//WaitForSingleObject(mArray, INFINITE);
 	WaitForSingleObject(mArg, INFINITE);
 
 	addKeyValue_AssociativeArray(&arg_key, sizeof(arg_key), &arg_value, sizeof(arg_value), array);
@@ -28,7 +28,7 @@ DWORD WINAPI Thread2(LPVOID lpParam)
 	file_close(fd);
 
 	ReleaseMutex(mArg);
-	ReleaseMutex(mArray);
+	//ReleaseMutex(mArray);
 	ExitThread(0);
 	return 0;
 }
@@ -44,10 +44,12 @@ DWORD WINAPI Thread1(LPVOID lpParam)
 		ReleaseMutex(mArg);
 
 		pool[i] = CreateThread(NULL, 0, Thread2, NULL, 0, &((DWORD*)lpParam)[i]);
+		if (pool[i] == NULL)
+			ExitThread(-1);
 		WaitForSingleObject(pool[i], INFINITE);
 		CloseHandle(pool[i]);
 	}
-	WaitForSingleObject(mArray, INFINITE);
+	//WaitForSingleObject(mArray, INFINITE);
 	ExitThread(0);
 	return 0;
 }
@@ -61,12 +63,12 @@ void main(void)
 
 #ifdef DEBUG
 {
-	printf("\nFresh\n");
+	printf("\nEmpty\n");
 	LinkedListNode* n = array->l->head->next;
 	while (n != array->l->head)
 	{
 		Pair* p = n->data;
-		printf("key: %ld\tvalue: %ld\n", *((size_t*)p->key_ptr), *((size_t*)p->value_ptr));
+		printf("key: %lld\tvalue: %lld\n", *((size_t*)p->key_ptr), *((size_t*)p->value_ptr));
 	}
 }
 #endif // DEBUG
@@ -88,7 +90,7 @@ void main(void)
 		while (n != array->l->head)
 		{
 			Pair* p = n->data;
-			printf("key: %ld\tvalue: %ld\n", *((size_t*)p->key_ptr), *((size_t*)p->value_ptr));
+			printf("key: %lld\tvalue: %lld\n", *((size_t*)p->key_ptr), *((size_t*)p->value_ptr));
 			n= n->next;
 		}
 	}
@@ -112,7 +114,7 @@ void main(void)
 			while (n != local_array->l->head)
 			{
 				Pair* p = n->data;
-				printf("key: %ld\tvalue: %ld\n", *((size_t*)p->key_ptr), *((size_t*)p->value_ptr));
+				printf("key: %lld\tvalue: %lld\n", *((size_t*)p->key_ptr), *((size_t*)p->value_ptr));
 				n = n->next;
 			}
 		}
