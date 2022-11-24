@@ -27,8 +27,12 @@ void addPair_AssociativeArray(Pair p, AssociativeArray* a)
 	void
 		* dup_key = malloc(p.key_size),
 		* dup_val = malloc(p.value_size);
+	if (!dup_key || !dup_val)
+		return;
 	memcpy(dup_key, p.key_ptr, p.key_size);
 	memcpy(dup_val, p.value_ptr, p.value_size);	
+	p.key_ptr = dup_key;
+	p.value_ptr = dup_val;
 	append_Linkedlist(a->l, &p, sizeof(p));
 }
 
@@ -102,11 +106,18 @@ void savebin_AssociativeArray(HANDLE fd, AssociativeArray* a)
 void restorebin_AssociativeArray(HANDLE fd, AssociativeArray* a)
 {
 	void* buf;
+	BOOL ERR_EOF;
 	size_t siz;
+	file_pos(fd, 0, FPOS_BEGIN);
 	while (!file_iseof(fd))
 	{
 		Pair* p = malloc(sizeof(Pair));
-		file_read(fd, &p->key_size, sizeof(p->key_size));
+		ERR_EOF = file_read(fd, &p->key_size, sizeof(p->key_size)) > 0;
+		if (!ERR_EOF)
+		{
+			free(p);
+			return;
+		}
 		p->key_ptr = malloc(p->key_size);
 		file_read(fd, p->key_ptr, p->key_size);
 		file_read(fd, &p->value_size, sizeof(p->value_size));

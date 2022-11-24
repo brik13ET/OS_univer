@@ -1,88 +1,122 @@
 #include <stdio.h>
-#include "AssociativeArray.h"
+#include <stdlib.h>
+#include <Windows.h>
 #include "FileIO.h"
+#include "AssociativeArray.h"
 
 #define THREADCOUNT 5
+#define DEBUG
 
-AssociativeArray* arr;
-int newNumber = 0;
+volatile AssociativeArray* array;
+volatile INT64 arg_key;
+volatile INT64 arg_value;
 
-HANDLE hThread1;
-HANDLE hThread2;
-HANDLE hMutex[2];
+volatile HANDLE mArray;
+volatile HANDLE mArg;
 
-WORD WINAPI Thread2(CONST LPVOID lpParam) {
+DWORD WINAPI Thread2(LPVOID lpParam)
+{
+	WaitForSingleObject(mArray, INFINITE);
+	WaitForSingleObject(mArg, INFINITE);
 
-	
-	//while (WaitForSingleObject(hMutex[0], INFINITE) != WAIT_OBJECT_0);
-	////OpenMutexW(hMutex[0], FALSE, NULL);
-	//int sq = newNumber * newNumber;
-	//int i = newNumber;
-	//if (!ReleaseMutex(hMutex[0]))
-	//	ExitThread(GetCurrentThreadId());
+	addKeyValue_AssociativeArray(&arg_key, sizeof(arg_key), &arg_value, sizeof(arg_value), array);
 
-	int i = GetCurrentThreadId();
-	int sq = i * i;
-	char f[20];
-
-	while (WaitForSingleObject(hMutex[1], INFINITE) != WAIT_OBJECT_0);
-	
-	addKeyValue_AssociativeArray(&i, sizeof(i), &sq, sizeof(sq), arr);
-
-	if (!ReleaseMutex(hMutex[1]))
-		ExitThread(GetCurrentThreadId());
-	
-	sprintf(&f[0], "%0.10d.bin", GetCurrentThreadId());
-	HANDLE fd = file_open(&f[0], FMODE_WRITE, NULL);
-	savebin_AssociativeArray(fd, arr);
+	char tmp[20];
+	sprintf_s(tmp, 20, "%u.bin", GetCurrentThreadId());
+	HANDLE fd = file_open(tmp, FMODE_WRITE, CREATE_ALWAYS);
+	savebin_AssociativeArray(fd, array);
 	file_close(fd);
-	
-	ReleaseMutex(hMutex[1]);
-	
+
+	ReleaseMutex(mArg);
+	ReleaseMutex(mArray);
 	ExitThread(0);
 	return 0;
 }
 
-WORD WINAPI Thread1(CONST LPVOID lpParam) {
-	UNREFERENCED_PARAMETER(lpParam);
-	HANDLE aThread[THREADCOUNT];
+DWORD WINAPI Thread1(LPVOID lpParam)
+{
+	HANDLE pool[THREADCOUNT];
 	for (size_t i = 0; i < THREADCOUNT; i++)
 	{
-		while(WaitForSingleObject(hMutex[0], INFINITE) != WAIT_OBJECT_0);
-		newNumber = i;
-		if (!ReleaseMutex(hMutex[0]))
-			return GetCurrentThreadId();
+		WaitForSingleObject(mArg, INFINITE);
+		arg_key = i*i;
+		arg_value = i;
+		ReleaseMutex(mArg);
 
-		aThread[i] = CreateThread(NULL, 0, &Thread2, &newNumber, 0, NULL);
+		pool[i] = CreateThread(NULL, 0, Thread2, NULL, 0, &((DWORD*)lpParam)[i]);
+		WaitForSingleObject(pool[i], INFINITE);
+		CloseHandle(pool[i]);
 	}
-	WaitForMultipleObjects(THREADCOUNT, &aThread[0], TRUE, INFINITE);
-	for (size_t i = 0; i < THREADCOUNT; i++)
-		CloseHandle(aThread[i]);
+	WaitForSingleObject(mArray, INFINITE);
 	ExitThread(0);
 	return 0;
 }
 
-int main() {
-	arr = new_AssociativeArray();
-	hMutex[0] = CreateMutex(NULL, FALSE, NULL);
-	hMutex[1] = CreateMutex(NULL, FALSE, NULL);
-	if (NULL == hMutex[0] || NULL == hMutex[1]) {
-		fprintf(stderr, "mutex = null");
-	}
-	HANDLE th1 = CreateThread(NULL, 0, Thread1, NULL, NULL, NULL);
-	WaitForSingleObject(th1, INFINITE);
-	WaitForMultipleObjects(2, &hMutex[0], TRUE, INFINITE);
-	CloseHandle(th1);
-	CloseHandle(hMutex[0]);
-	CloseHandle(hMutex[1]);
-	LinkedListNode* n = arr->l->head->next;
-	while(n != arr->l->head)
+void main(void)
+{
+	mArray = CreateMutexW(NULL, FALSE, TEXT("ARRAY\0"));
+	mArg = CreateMutexW(NULL, FALSE, TEXT("ARG\0"));
+	DWORD ids[THREADCOUNT];
+	array = new_AssociativeArray();
+
+#ifdef DEBUG
+{
+	printf("\nFresh\n");
+	LinkedListNode* n = array->l->head->next;
+	while (n != array->l->head)
 	{
-		Pair* r = (Pair*)n->data;
-		if (r != NULL)
-		printf("%d: \t%d\n", *((int*)r->key_ptr), *((int*)r->value_ptr));
-		n = n->next;
+		Pair* p = n->data;
+		printf("key: %ld\tvalue: %ld\n", *((size_t*)p->key_ptr), *((size_t*)p->value_ptr));
 	}
-	del_AssociativeArray(arr);
-	return 0;
+}
+#endif // DEBUG
+
+
+	DWORD dwThreadId;
+	HANDLE t1 = CreateThread(NULL, 0, Thread1, &ids[0], 0, &dwThreadId);
+
+	HANDLE OBJS[] = {mArray, mArg, t1};
+	WaitForMultipleObjects(3, &OBJS[0], TRUE, INFINITE);
+	CloseHandle(t1);
+	CloseHandle(mArray);
+	CloseHandle(mArg);
+
+#ifdef DEBUG
+	{
+		printf("\nModded\n");
+		LinkedListNode* n = array->l->head->next;
+		while (n != array->l->head)
+		{
+			Pair* p = n->data;
+			printf("key: %ld\tvalue: %ld\n", *((size_t*)p->key_ptr), *((size_t*)p->value_ptr));
+			n= n->next;
+		}
+	}
+#endif // DEBUG
+
+	del_AssociativeArray(array);
+
+	
+	for (size_t i = 0; i < THREADCOUNT; i++)
+	{
+		AssociativeArray* local_array = new_AssociativeArray();
+		char tmp[20];
+		sprintf_s(tmp, 20, "%u.bin", ids[i]);
+		HANDLE fd = file_open(tmp, FMODE_READ, OPEN_ALWAYS);
+		restorebin_AssociativeArray(fd, local_array);
+		file_close(fd);
+#ifdef DEBUG
+		{
+			printf("\nfile \"%s\"\n", tmp);
+			LinkedListNode* n = local_array->l->head->next;
+			while (n != local_array->l->head)
+			{
+				Pair* p = n->data;
+				printf("key: %ld\tvalue: %ld\n", *((size_t*)p->key_ptr), *((size_t*)p->value_ptr));
+				n = n->next;
+			}
+		}
+#endif // DEBUG
+		del_AssociativeArray(local_array);
+	}
 }
