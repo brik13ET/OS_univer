@@ -1,5 +1,4 @@
 #include <Windows.h>
-#include "pch.h"
 #include "FileIO.h"
 
 HANDLE	file_open(char* path, enum FMODE mode, DWORD conv)

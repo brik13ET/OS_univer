@@ -1,14 +1,15 @@
+#include <stdio.h>
 #include <Windows.h>
 #include "AssociativeArray.h"
 #include "FileIO.h"
 
-#define Save
+//#define Save
 
 int main(int argc, char* argv[])
 {
 	AssociativeArray* a = new_AssociativeArray();
 	#ifdef Save
-	for (size_t i = 0; i <= 32; i++)
+	for (size_t i = 0; i <= 10; i++)
 	{
 		uint32_t pow3 = i*i*i;
 		addKeyValue_AssociativeArray(&i, sizeof(i), &pow3, sizeof(pow3), a);

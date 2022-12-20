@@ -7,7 +7,7 @@
 int main(int argc, char* argv[])
 {
 	AssociativeArray* l = new_AssociativeArray();
-	for (size_t i = 0; i < 32; i++)
+	for (size_t i = 0; i < 10; i++)
 	{
 		int sq = i * i;
 		addKeyValue_AssociativeArray(&i, sizeof(i), &sq, sizeof(sq), l);

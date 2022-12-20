@@ -1,7 +1,6 @@
 #pragma once
 #include <stdlib.h>
 #include <string.h>
-#include "pch.h"
 #include "LinkedList.h"
 #include "FileIO.h"
 
