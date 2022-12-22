@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <Windows.h>
 #define LAB6_ONLYTYPE
-#include "..\\Lab6DLL\Containers.h"	
+#include "..\\Lab6DLL\\Containers.h"	
 
 // явное
 void* MyAlloc(size_t siz)
@@ -21,7 +21,8 @@ int main()
 	{
 		AssociativeArray* (*new_AssociativeArray)(Allocator, Deallocator) = GetProcAddress(ee, "new_AssociativeArray");
 		void (*del_AssociativeArray)(AssociativeArray*) = GetProcAddress(ee, "del_AssociativeArray");
-		addKeyValue_AssociativeArray = GetProcAddress(ee, "addKeyValue_AssociativeArray");
+		void (*addKeyValue_AssociativeArray)(void*, size_t, void*, size_t, AssociativeArray*) = GetProcAddress(ee, "addKeyValue_AssociativeArray");
+		Pair* (*at_AssociativeArray)(void*, size_t, AssociativeArray*) = GetProcAddress(ee, "at_AssociativeArray");
 
 		void (*del_LinkedList)(LinkedList*) = GetProcAddress(ee, "del_LinkedList");
 
@@ -33,12 +34,12 @@ int main()
 		AssociativeArray* arr = new_AssociativeArray(MyAlloc, MyDealloc);
 		printf("AssociativeArray: %p\n", arr);
 
-		for (int i = 0; i < 32; i++)
+		for (int i = 0; i < 10; i++)
 		{
 			int sq = i * i;
 			addKeyValue_AssociativeArray(&i, sizeof(i), &sq, sizeof(sq), arr);
 		}
-		for (int i = 0; i < 32; i++)
+		for (int i = 0; i < 10; i++)
 		{
 			Pair* p = at_AssociativeArray(&i, sizeof(i), arr);
 			printf("k: %04d\tv: %04d\n", *(int*)p->key_ptr, *(int*)p->value_ptr);

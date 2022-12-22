@@ -112,6 +112,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>D:\GitRepos\OS_univer\x64\Debug\Lab6DLL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -131,17 +132,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AssociativeArray.h" />
-    <ClInclude Include="FileIO.h" />
-    <ClInclude Include="LinkedList.h" />
-    <ClInclude Include="mem.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="AssociativeArray.c" />
-    <ClCompile Include="FileIO.c" />
-    <ClCompile Include="Linkedlist.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="mem.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
